@@ -1,8 +1,35 @@
 <?php 
 ob_start();
+?>
+<?php
+session_start();
+ @require('Core.inc.php');
+ @require('Connect.inc.php');
 if(isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])){
-    header('Location:home.php');
+     header('Location:home.php');
+     die();         
+}else{
+    if(isset($_POST['email']) && isset($_POST['password'])){
+        if(!empty($_POST['email']) && !empty($_POST['password'])){
+            $email=$_POST['email'];
+            $password=$_POST['password'];
+            $query="SELECT `id` FROM `register` WHERE `email`='$email' AND `password`='$password'";
+            $query_run=mysqli_query($con,$query);
+            if($query_run){
+                $query_num_rows=mysqli_num_rows($query_run);
+                if($query_num_rows==0){
+                    echo 'Invalid Email Id and Password';
+                }else if($query_num_rows==1){
+                    $user_id=mysqli_result($query_run,0,'id');
+                    $_SESSION['user_id']=$user_id; 
+                    header('Location:home.php');
+                }
+            }
+
+        }
+     }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -98,26 +125,3 @@ if(isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])){
     </body>
 
 </html>
-<?php
- @require('Core.inc.php');
- @require('Connect.inc.php');
- if(isset($_POST['email']) && isset($_POST['password'])){
-    if(!empty($_POST['email']) && !empty($_POST['password'])){
-        $email=$_POST['email'];
-        $password=$_POST['password'];
-        $query="SELECT `id` FROM `register` WHERE `email`='$email' AND `password`='$password'";
-        $query_run=mysqli_query($con,$query);
-        if($query_run){
-            $query_num_rows=mysqli_num_rows($query_run);
-            if($query_num_rows==0){
-                echo 'Invalid Email Id and Password';
-            }else if($query_num_rows==1){
-                $user_id=mysqli_result($query_run,0,'id');
-                $_SESSION['user_id']=$user_id; 
-                header('Location:home.php');
-            }
-        }
-
-    }
- }
-?>

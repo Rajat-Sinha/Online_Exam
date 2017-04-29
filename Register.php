@@ -1,3 +1,43 @@
+<?php
+@require('Core.inc.php');
+@require('Connect.inc.php');
+$name=@$_POST['name'];
+$username=@$_POST['username'];
+$email=@$_POST['email'];
+$pass=@$_POST['password'];
+$repass=@$_POST['repassword'];
+if(isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])){
+     header('Location:home.php');
+     die();         
+}else{
+	if(isset($name) && isset($username) && isset($email) && isset($pass) && isset($repass)){
+		if(!empty($name) && !empty($username) && !empty($email) && !empty($pass) && !empty($repass)){
+			if(strlen($name)>20 || strlen($username)>20 || strlen($email)>30 || strlen($pass)>30){
+				echo 'Please ahear to maxlength of fields.';
+			}else{
+				if($pass==$repass){
+					$query="SELECT `username` FROM `register` WHERE `username`='$username'";
+					$query_run=mysqli_query($con,$query);
+					if(mysqli_num_rows($query_run)>0){
+						echo $username.' Already Exists';
+					}else{
+						$query="INSERT INTO `register` (`id`, `name`, `username`, `email`, `password`) VALUES (NULL, '$name', '$username', '$email', '$pass');";
+						if($query_run=mysqli_query($con,$query)){
+							
+							header('Location:index.php');
+						}else{
+							echo  'Could Not Be Register';
+						}
+					}
+			    }else{
+					echo 'Password Doesn\'t Match';
+				}
+			}
+
+		}
+	}
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -106,38 +146,3 @@
 	</body>
 
 </html>
-<?php
-@require('Core.inc.php');
-@require('Connect.inc.php');
-$name=@$_POST['name'];
-$username=@$_POST['username'];
-$email=@$_POST['email'];
-$pass=@$_POST['password'];
-$repass=@$_POST['repassword'];
-if(isset($name) && isset($username) && isset($email) && isset($pass) && isset($repass)){
-	if(!empty($name) && !empty($username) && !empty($email) && !empty($pass) && !empty($repass)){
-		if(strlen($name)>20 || strlen($username)>20 || strlen($email)>30 || strlen($pass)>30){
-			echo 'Please ahear to maxlength of fields.';
-		}else{
-			if($pass==$repass){
-				$query="SELECT `username` FROM `register` WHERE `username`='$username'";
-				$query_run=mysqli_query($con,$query);
-				if(mysqli_num_rows($query_run)>0){
-					echo $username.' Already Exists';
-				}else{
-					$query="INSERT INTO `register` (`id`, `name`, `username`, `email`, `password`) VALUES (NULL, '$name', '$username', '$email', '$pass');";
-					if($query_run=mysqli_query($con,$query)){
-						
-						header('Location:index.php');
-					}else{
-						echo  'Could Not Be Register';
-					}
-				}
-		    }else{
-				echo 'Password Doesn\'t Match';
-			}
-		}
-
-	}
-}
-?>
