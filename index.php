@@ -2,32 +2,35 @@
 ob_start();
 ?>
 <?php
-session_start();
- @require('Core.inc.php');
- @require('Connect.inc.php');
-if(isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])){
-     header('Location:home.php');
-     die();         
-}else{
-    if(isset($_POST['email']) && isset($_POST['password'])){
-        if(!empty($_POST['email']) && !empty($_POST['password'])){
-            $email=$_POST['email'];
-            $password=$_POST['password'];
-            $query="SELECT `id` FROM `register` WHERE `email`='$email' AND `password`='$password'";
-            $query_run=mysqli_query($con,$query);
-            if($query_run){
-                $query_num_rows=mysqli_num_rows($query_run);
-                if($query_num_rows==0){
-                    echo 'Invalid Email Id and Password';
-                }else if($query_num_rows==1){
-                    $user_id=mysqli_result($query_run,0,'id');
-                    $_SESSION['user_id']=$user_id; 
-                    header('Location:home.php');
-                }
-            }
-
+function mysqli_result($result, $row, $field = 0) {
+    // Adjust the result pointer to that specific row
+    $result->data_seek($row);
+    // Fetch result array
+    $data = $result->fetch_array();
+ 
+    return $data[$field];
+}
+@require('AdminCore.inc.php');
+@require('AdminConnect.php');
+if(isset($_POST['email']) && isset($_POST['password'])){
+    if(!empty($_POST['email']) && !empty($_POST['password'])){
+        $email=$_POST['email'];
+        $pass=$_POST['password'];
+        $query="SELECT `id` FROM `admin` WHERE  `Email`='$email' AND `Password`='$pass'";
+        $query_run=mysqli_query($con,$query);
+        if($query_run){
+           $query_num_rows=mysqli_num_rows($query_run);
+           if($query_num_rows==1){
+             $admin_id=mysqli_result($query_run,0,'id');
+             $_SESSION['admin_id']=$admin_id;
+            header('Location:admin.php');
+           }else{
+            echo 'Invalid Email and Password';
+           }
         }
-     }
+    }else{
+        echo 'All field are Required';
+    }
 }
 
 ?>
@@ -41,10 +44,10 @@ if(isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])){
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Online Web Quiz</title>
         <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
-        <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css">
-		<link rel="stylesheet" href="assets/css/form-elements.css">
-        <link rel="stylesheet" href="assets/css/style.css">
+        <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../assets/font-awesome/css/font-awesome.min.css">
+		<link rel="stylesheet" href="../assets/css/form-elements.css">
+        <link rel="stylesheet" href="../assets/css/style.css">
 
     </head>
 
@@ -57,7 +60,7 @@ if(isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])){
                 <div class="container">
                     <div class="row">
                         <div class="col-sm-8 col-sm-offset-2 text">
-                            <h1><a href="index.php"><strong>Online</strong> Web Quiz</a></h1>
+                            <h1><a href="index.php"><strong>Admin</strong> Page</a></h1>
                             <!--<div class="description">
                             	<p>
 	                            	COol
@@ -89,10 +92,6 @@ if(isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])){
 			                        <button type="submit" class="btn">Sign in!</button>
 			                    </form>
 		                    </div>
-                        </div>
-                        <div class="col-md-3">
-                        	<h3 style="color:white;">...or Register:</h3>
-                        	<a href="Register.php"><button type="submit" class="btn btn-lg">Register!</button></a>
                         </div>
                     </div>
                    <!-- <div class="row">
